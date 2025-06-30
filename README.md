@@ -1,6 +1,6 @@
 # Rust file system RTS
 
-The aim of this project is to create a file system, initially for the “Advanced Systems” project in the M1S2 Computer Science program at Paris Cité, this time in the rust language.
+The aim of this project is to create a file system, initially for the “Advanced Systems” [project](subject.pdf) in the M1S2 Computer Science program at Paris Cité, this time in the rust language.
 
 ## Prerequisites
 
