@@ -17,7 +17,7 @@ impl Sha1 {
     /// * `data` the array to compute the SHA-1
     pub fn compute(data: &[u8]) -> Self {
         let mut hasher = Sha1Hasher::new(); // Hasher to compute the SHA-1
-        hasher.update(&data); // We update the haser with datas we want to compute
+        hasher.update(data); // We update the haser with datas we want to compute
         let res = hasher.finalize(); // We compute the SHA-1 and get the result
         let bytes = res.into(); // We get the result in bytes
         Sha1 { bytes }
@@ -28,7 +28,7 @@ impl fmt::Display for Sha1 {
     /// Print the SHA-1 with bytes in sequence
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for byte in &self.bytes {
-            write!(f, "{:02x}", byte)?;
+            write!(f, "{byte:02x}")?;
         }
         Ok(())
     }
