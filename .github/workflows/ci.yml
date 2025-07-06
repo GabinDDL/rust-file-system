@@ -24,9 +24,11 @@ jobs:
         with:
           path: |
             ~/.cargo/registry
-            ~/.cargo/gitThe aim of this project is to create a file system, initially for the “Advanced Systems” project in the M1S2 Computer Science program at Paris Cité, this time in the rust language.
+            ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
       - name: Build project
         run: cargo build --release
@@ -37,11 +39,24 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v3
+
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
+
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
       - name: Run tests
         run: cargo test --verbose
 
@@ -51,6 +66,7 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v3
+
       - name: Check formatting
         run: cargo fmt --check
 
@@ -60,11 +76,24 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v3
+
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           components: clippy
+
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
       - name: Run clippy
         run: cargo clippy --all-targets -- -D warnings
 
@@ -75,11 +104,31 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Cache cargo registry and target
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Cache cargo bin (tarpaulin)
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/bin
+          key: ${{ runner.os }}-cargo-bin-tarpaulin
+
       - name: Install dependencies for tarpaulin
         run: sudo apt-get update && sudo apt-get install -y libssl-dev pkg-config
 
       - name: Install tarpaulin
-        run: cargo install cargo-tarpaulin
+        run: |
+          if ! command -v cargo-tarpaulin &> /dev/null; then
+            cargo install cargo-tarpaulin
+          fi
 
       - name: Run tarpaulin
         run: cargo tarpaulin --out Xml
@@ -89,3 +138,4 @@ jobs:
         with:
           name: coverage-report
           path: tarpaulin-report.xml
+
